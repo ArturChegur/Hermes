@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="
+           http://www.liquibase.org/xml/ns/dbchangelog
+           http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="001-create-telegram-chat-link" author="ArthurChegur">
+
+        <createTable tableName="telegram_chat_link">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints primaryKey="true"
+                        primaryKeyName="pk_telegram_chat_link_token"
+                        nullable="false"/>
+            </column>
+
+            <column name="code" type="varchar(64)">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="chat_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="created_at" type="timestamp">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="expires_at" type="timestamp">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addUniqueConstraint
+                tableName="telegram_chat_link"
+                columnNames="code"
+                constraintName="uk_telegram_chat_link_token_code"/>
+
+        <createIndex
+                tableName="telegram_chat_link"
+                indexName="idx_telegram_chat_link_token_expires_at">
+            <column name="expires_at"/>
+        </createIndex>
+
+        <createIndex
+                tableName="telegram_chat_link"
+                indexName="idx_telegram_chat_link_token_chat_id">
+            <column name="chat_id"/>
+        </createIndex>
+
+    </changeSet>
+
+</databaseChangeLog>
