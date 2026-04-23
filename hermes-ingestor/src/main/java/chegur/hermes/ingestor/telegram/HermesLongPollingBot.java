@@ -1,6 +1,6 @@
 package chegur.hermes.ingestor.telegram;
 
-import chegur.hermes.ingestor.configuration.TelegramBotProperties;
+import chegur.hermes.ingestor.properties.TelegramBotProperties;
 
 import chegur.hermes.ingestor.service.TelegramProcessingService;
 

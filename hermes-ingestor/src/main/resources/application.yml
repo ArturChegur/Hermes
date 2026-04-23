@@ -12,8 +12,10 @@ spring:
   kafka:
     bootstrap-servers: kafka:9092
     producer:
-      key-serializer: org.apache.kafka.common.serialization.StringSerializer
-      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+        acks: all
+        retries: 10
+        properties:
+            enable.idempotence: true
 
 telegram:
   bot:
@@ -22,11 +24,6 @@ telegram:
 
 hermes:
   frontend:
-    base-url: 'http://188.243.216.135:8080'
+    base-url: ${HOST_BASE_URL}
   kafka:
     updates-topic: telegram-updates
-
-logging:
-  level:
-    chegur.hermes.ingestor: INFO
-    chegur.hermes.ingestor.service.TelegramUpdateIngestionService: DEBUG

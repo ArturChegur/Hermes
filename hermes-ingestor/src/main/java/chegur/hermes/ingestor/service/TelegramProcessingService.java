@@ -20,13 +20,15 @@ import org.telegram.telegrambots.meta.api.objects.commands.BotCommand;
 import org.telegram.telegrambots.meta.api.objects.message.Message;
 
 @Slf4j
-@Getter
 @Service
 @RequiredArgsConstructor
 public class TelegramProcessingService {
 
   private final BotCommandOperations botCommandHandler;
 
+  private final TelegramUpdateKafkaService telegramUpdateKafkaService;
+
+  @Getter
   private final List<BotCommand> botCommands = List.of(
     new BotCommand(BotCommands.GET_LINK.getValue(), BotCommands.GET_LINK.getDescription())
   );
@@ -44,6 +46,8 @@ public class TelegramProcessingService {
       String command = extractCommand(update).orElseThrow();
       commandHandlers.get(command).accept(update);
     }
+
+    telegramUpdateKafkaService.ingest(update);
   }
 
   private Optional<String> extractCommand(Update update) {
