@@ -1,5 +1,7 @@
 package chegur.hermes.ingestor.util;
 
+import chegur.hermes.ingestor.command.BotCommands;
+
 import java.util.List;
 
 import lombok.experimental.UtilityClass;
@@ -52,6 +54,20 @@ public final class TelegramUpdateValidator {
     }
 
     String command = text.substring(0, endIndex);
-    return StringUtils.hasText(command);
+    if (!StringUtils.hasText(command)) {
+      return false;
+    }
+
+    return isKnownCommand(command);
+  }
+
+  private static boolean isKnownCommand(String command) {
+    for (BotCommands botCommand : BotCommands.values()) {
+      if (botCommand.getValue().equals(command)) {
+        return true;
+      }
+    }
+
+    return false;
   }
 }

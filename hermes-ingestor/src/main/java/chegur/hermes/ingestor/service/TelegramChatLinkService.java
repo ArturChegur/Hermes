@@ -2,10 +2,9 @@ package chegur.hermes.ingestor.service;
 
 import chegur.hermes.ingestor.model.TelegramChatLinkEntity;
 import chegur.hermes.ingestor.properties.FrontendLinkProperties;
-import chegur.hermes.ingestor.repositary.TelegramChatLinkRepository;
+import chegur.hermes.ingestor.repository.TelegramChatLinkRepository;
 
 import java.security.SecureRandom;
-import java.time.Clock;
 import java.time.LocalDateTime;
 import java.util.Base64;
 

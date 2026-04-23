@@ -1,4 +1,4 @@
-package chegur.hermes.ingestor.repositary;
+package chegur.hermes.ingestor.repository;
 
 import chegur.hermes.ingestor.model.TelegramChatLinkEntity;
 
@@ -13,7 +13,7 @@ public interface TelegramChatLinkRepository extends CrudRepository<TelegramChatL
 
   @Query("""
     select id, code, chat_id, created_at, expires_at
-    from telegram_chat_link_token
+    from telegram_chat_link
     where chat_id = :chatId
       and expires_at > :now
     order by expires_at desc
