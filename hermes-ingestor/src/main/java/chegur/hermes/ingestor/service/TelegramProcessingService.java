@@ -21,21 +21,26 @@ import org.telegram.telegrambots.meta.api.objects.message.Message;
 
 @Slf4j
 @Service
-@RequiredArgsConstructor
 public class TelegramProcessingService {
 
-  private final BotCommandOperations botCommandHandler;
-
   private final TelegramUpdateKafkaService telegramUpdateKafkaService;
+
+  private final Map<String, Consumer<Update>> commandHandlers;
 
   @Getter
   private final List<BotCommand> botCommands = List.of(
     new BotCommand(BotCommands.GET_LINK.getValue(), BotCommands.GET_LINK.getDescription())
   );
 
-  private final Map<String, Consumer<Update>> commandHandlers = Map.of(
-    BotCommands.GET_LINK.getValue(), botCommandHandler::getStatisticLinkForCurrentChat
-  );
+  public TelegramProcessingService(BotCommandOperations botCommandHandler,
+                                   TelegramUpdateKafkaService telegramUpdateKafkaService) {
+    this.telegramUpdateKafkaService = telegramUpdateKafkaService;
+
+    this.commandHandlers = Map.of(
+      BotCommands.GET_LINK.getValue(),
+      botCommandHandler::getStatisticLinkForCurrentChat
+    );
+  }
 
   public void processUpdate(Update update) {
     if (TelegramUpdateValidator.hasTextMessage(update)) {
