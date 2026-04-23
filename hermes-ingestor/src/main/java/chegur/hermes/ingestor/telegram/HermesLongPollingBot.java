@@ -1,5 +1,6 @@
 package chegur.hermes.ingestor.telegram;
 
+import chegur.hermes.ingestor.configuration.TelegramClientConfiguration;
 import chegur.hermes.ingestor.properties.TelegramBotProperties;
 
 import chegur.hermes.ingestor.service.TelegramProcessingService;
@@ -17,6 +18,7 @@ import org.telegram.telegrambots.longpolling.util.LongPollingSingleThreadUpdateC
 import org.telegram.telegrambots.meta.api.methods.commands.SetMyCommands;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+import org.telegram.telegrambots.meta.generics.TelegramClient;
 
 @Slf4j
 @Component
@@ -27,7 +29,7 @@ public class HermesLongPollingBot implements SpringLongPollingBot {
 
   private final TelegramProcessingService telegramProcessingService;
 
-  private final OkHttpTelegramClient telegramClient = new OkHttpTelegramClient(getBotToken());
+  private final TelegramClient telegramClient;
 
   @Override
   public String getBotToken() {

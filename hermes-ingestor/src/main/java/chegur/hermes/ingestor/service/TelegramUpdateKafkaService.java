@@ -33,17 +33,8 @@ public class TelegramUpdateKafkaService {
         .whenComplete((result, ex) -> {
           if (ex != null) {
             log.error("Failed to publish telegram event. key = {}, topic = {}",
-              key,
-              kafkaProperties.getUpdatesTopic(),
-              ex);
-            return;
+              key, kafkaProperties.getUpdatesTopic(), ex);
           }
-
-          log.debug("Published telegram event. key = {}, topic = {}, partition = {}, offset = {}",
-            key,
-            kafkaProperties.getUpdatesTopic(),
-            result.getRecordMetadata().partition(),
-            result.getRecordMetadata().offset());
         });
     });
   }
