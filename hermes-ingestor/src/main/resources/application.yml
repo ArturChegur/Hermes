@@ -1,0 +1,32 @@
+server:
+  port: 8081
+
+spring:
+  application:
+    name: hermes-ingestor
+  datasource:
+    url: ${DB_URL}
+    username: ${DB_USER}
+    password: ${DB_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+  kafka:
+    bootstrap-servers: kafka:9092
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+
+telegram:
+  bot:
+    token: ${TELEGRAM_BOT_TOKEN}
+    username: ${TELEGRAM_BOT_USERNAME}
+
+hermes:
+  frontend:
+    base-url: 'http://188.243.216.135:8080'
+  kafka:
+    updates-topic: telegram-updates
+
+logging:
+  level:
+    chegur.hermes.ingestor: INFO
+    chegur.hermes.ingestor.service.TelegramUpdateIngestionService: DEBUG
