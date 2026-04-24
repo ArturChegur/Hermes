@@ -7,5 +7,7 @@
           https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
 
     <include file="db/changelog/changes/001-create-telegram-chat-link.xml"/>
-    <include file="db/changelog/changes/002-create-telegram-schema.xml"/>
+    <include file="db/changelog/changes/002-create-telegram-user.xml"/>
+    <include file="db/changelog/changes/003-create-telegram-chat.xml"/>
+    <include file="db/changelog/changes/004-create-telegram-message.xml"/>
 </databaseChangeLog>

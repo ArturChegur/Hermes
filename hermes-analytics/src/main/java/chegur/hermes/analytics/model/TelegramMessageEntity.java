@@ -27,6 +27,9 @@ public class TelegramMessageEntity {
   @Column("message_date")
   private Instant messageDate;
 
+  @Column("created_at")
+  private Instant createdAt;
+
   @Column("text")
   private String text;
 

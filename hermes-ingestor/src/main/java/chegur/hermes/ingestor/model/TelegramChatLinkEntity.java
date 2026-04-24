@@ -2,16 +2,16 @@ package chegur.hermes.ingestor.model;
 
 import java.time.LocalDateTime;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
 @Getter
 @Builder
-@RequiredArgsConstructor
+@AllArgsConstructor
 @Table("telegram_chat_link")
 public class TelegramChatLinkEntity {
 

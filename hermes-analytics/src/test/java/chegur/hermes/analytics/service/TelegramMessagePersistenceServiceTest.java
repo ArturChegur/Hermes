@@ -105,6 +105,7 @@ class TelegramMessagePersistenceServiceTest {
     org.assertj.core.api.Assertions.assertThat(saved.getText()).isEqualTo("hello");
     org.assertj.core.api.Assertions.assertThat(saved.getChatRef()).isEqualTo(10L);
     org.assertj.core.api.Assertions.assertThat(saved.getUserRef()).isEqualTo(20L);
+    org.assertj.core.api.Assertions.assertThat(saved.getCreatedAt()).isNotNull();
   }
 
   @Test

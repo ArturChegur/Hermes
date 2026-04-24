@@ -7,6 +7,7 @@ import chegur.hermes.analytics.model.TelegramUserEntity;
 import chegur.hermes.analytics.repository.TelegramChatRepository;
 import chegur.hermes.analytics.repository.TelegramMessageRepository;
 import chegur.hermes.analytics.repository.TelegramUserRepository;
+import java.time.Instant;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -38,6 +39,7 @@ public class TelegramMessagePersistenceService {
       .telegramUpdateId(event.getUpdateId())
       .telegramMessageId(event.getMessageId())
       .messageDate(event.getMessageDate())
+      .createdAt(Instant.now())
       .text(event.getText())
       .userRef(user == null ? null : user.getId())
       .chatRef(chat.getId())
