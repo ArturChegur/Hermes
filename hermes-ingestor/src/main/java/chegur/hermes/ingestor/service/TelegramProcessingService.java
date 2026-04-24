@@ -3,6 +3,7 @@ package chegur.hermes.ingestor.service;
 import chegur.hermes.ingestor.command.BotCommands;
 import chegur.hermes.ingestor.dispatcher.BotCommandOperations;
 
+import chegur.hermes.ingestor.producer.TelegramUpdateKafkaProducer;
 import chegur.hermes.ingestor.util.TelegramUpdateValidator;
 
 import java.util.List;
@@ -11,7 +12,6 @@ import java.util.Optional;
 import java.util.function.Consumer;
 
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.objects.MessageEntity;
@@ -23,7 +23,7 @@ import org.telegram.telegrambots.meta.api.objects.message.Message;
 @Service
 public class TelegramProcessingService {
 
-  private final TelegramUpdateKafkaService telegramUpdateKafkaService;
+  private final TelegramUpdateKafkaProducer telegramUpdateKafkaProducer;
 
   private final Map<String, Consumer<Update>> commandHandlers;
 
@@ -33,8 +33,8 @@ public class TelegramProcessingService {
   );
 
   public TelegramProcessingService(BotCommandOperations botCommandHandler,
-                                   TelegramUpdateKafkaService telegramUpdateKafkaService) {
-    this.telegramUpdateKafkaService = telegramUpdateKafkaService;
+                                   TelegramUpdateKafkaProducer telegramUpdateKafkaProducer) {
+    this.telegramUpdateKafkaProducer = telegramUpdateKafkaProducer;
 
     this.commandHandlers = Map.of(
       BotCommands.GET_LINK.getValue(),
@@ -52,7 +52,7 @@ public class TelegramProcessingService {
       commandHandlers.get(command).accept(update);
     }
 
-    telegramUpdateKafkaService.ingest(update);
+    telegramUpdateKafkaProducer.ingest(update);
   }
 
   private Optional<String> extractCommand(Update update) {

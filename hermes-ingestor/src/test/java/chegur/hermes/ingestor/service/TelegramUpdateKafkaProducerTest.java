@@ -6,6 +6,8 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import chegur.hermes.ingestor.producer.TelegramUpdateKafkaProducer;
+
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
@@ -21,7 +23,7 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
 @ExtendWith(MockitoExtension.class)
-class TelegramUpdateKafkaServiceTest {
+class TelegramUpdateKafkaProducerTest {
 
   @Mock
   private KafkaTemplate<String, TelegramMessageEvent> kafkaTemplate;
@@ -33,7 +35,7 @@ class TelegramUpdateKafkaServiceTest {
   private KafkaIngestorProperties kafkaProperties;
 
   @InjectMocks
-  private TelegramUpdateKafkaService service;
+  private TelegramUpdateKafkaProducer service;
 
   @Test
   void ingestShouldDoNothingWhenMapperReturnsEmpty() {

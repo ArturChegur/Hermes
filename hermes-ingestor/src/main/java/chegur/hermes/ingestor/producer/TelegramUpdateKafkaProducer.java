@@ -1,4 +1,4 @@
-package chegur.hermes.ingestor.service;
+package chegur.hermes.ingestor.producer;
 
 import chegur.hermes.ingestor.dto.TelegramMessageEvent;
 import chegur.hermes.ingestor.mapper.TelegramMessageEventMapper;
@@ -15,7 +15,7 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class TelegramUpdateKafkaService {
+public class TelegramUpdateKafkaProducer {
 
   private final KafkaTemplate<String, TelegramMessageEvent> kafkaTemplate;
 

@@ -1,29 +1,29 @@
 server:
-  port: 8081
+    port: 8081
 
 spring:
-  application:
-    name: hermes-ingestor
-  datasource:
-    url: ${DB_URL}
-    username: ${DB_USER}
-    password: ${DB_PASSWORD}
-    driver-class-name: org.postgresql.Driver
-  kafka:
-    bootstrap-servers: kafka:9092
-    producer:
-        acks: all
-        retries: 10
-        properties:
-            enable.idempotence: true
+    application:
+        name: hermes-ingestor
+    datasource:
+        url: ${DB_URL}
+        username: ${DB_USER}
+        password: ${DB_PASSWORD}
+        driver-class-name: org.postgresql.Driver
+    kafka:
+        bootstrap-servers: kafka:9092
+        producer:
+            acks: all
+            retries: 10
+            properties:
+                enable.idempotence: true
 
 telegram:
-  bot:
-    token: ${TELEGRAM_BOT_TOKEN}
-    username: ${TELEGRAM_BOT_USERNAME}
+    bot:
+        token: ${TELEGRAM_BOT_TOKEN}
+        username: ${TELEGRAM_BOT_USERNAME}
 
 hermes:
-  frontend:
-    base-url: ${HOST_BASE_URL}
-  kafka:
-    updates-topic: telegram-updates
+    frontend:
+        base-url: ${HOST_BASE_URL}
+    kafka:
+        updates-topic: ${UPDATES_KAFKA_TOPIC}

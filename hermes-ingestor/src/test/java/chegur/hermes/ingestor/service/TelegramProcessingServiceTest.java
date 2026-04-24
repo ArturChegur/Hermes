@@ -6,6 +6,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
 import chegur.hermes.ingestor.dispatcher.BotCommandOperations;
+import chegur.hermes.ingestor.producer.TelegramUpdateKafkaProducer;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -23,7 +24,7 @@ class TelegramProcessingServiceTest {
   private BotCommandOperations botCommandOperations;
 
   @Mock
-  private TelegramUpdateKafkaService telegramUpdateKafkaService;
+  private TelegramUpdateKafkaProducer telegramUpdateKafkaProducer;
 
   @InjectMocks
   private TelegramProcessingService telegramProcessingService;
@@ -35,7 +36,7 @@ class TelegramProcessingServiceTest {
     telegramProcessingService.processUpdate(update);
 
     verify(botCommandOperations, never()).getStatisticLinkForCurrentChat(update);
-    verify(telegramUpdateKafkaService, never()).ingest(update);
+    verify(telegramUpdateKafkaProducer, never()).ingest(update);
   }
 
   @Test
@@ -45,7 +46,7 @@ class TelegramProcessingServiceTest {
     telegramProcessingService.processUpdate(update);
 
     verify(botCommandOperations).getStatisticLinkForCurrentChat(update);
-    verify(telegramUpdateKafkaService).ingest(update);
+    verify(telegramUpdateKafkaProducer).ingest(update);
   }
 
   @Test
@@ -55,7 +56,7 @@ class TelegramProcessingServiceTest {
     telegramProcessingService.processUpdate(update);
 
     verify(botCommandOperations, never()).getStatisticLinkForCurrentChat(update);
-    verify(telegramUpdateKafkaService).ingest(update);
+    verify(telegramUpdateKafkaProducer).ingest(update);
   }
 
   @Test
@@ -65,7 +66,7 @@ class TelegramProcessingServiceTest {
     telegramProcessingService.processUpdate(update);
 
     verify(botCommandOperations, never()).getStatisticLinkForCurrentChat(update);
-    verify(telegramUpdateKafkaService).ingest(update);
+    verify(telegramUpdateKafkaProducer).ingest(update);
   }
 
   @Test
@@ -90,7 +91,7 @@ class TelegramProcessingServiceTest {
       .isInstanceOf(IllegalStateException.class)
       .hasMessage("command failed");
 
-    verify(telegramUpdateKafkaService, never()).ingest(update);
+    verify(telegramUpdateKafkaProducer, never()).ingest(update);
   }
 
   private Update plainTextUpdate(String text) {

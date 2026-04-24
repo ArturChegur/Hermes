@@ -2,14 +2,14 @@ package chegur.hermes.analytics.model;
 
 import lombok.Builder;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import lombok.AllArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
 @Getter
 @Builder
-@RequiredArgsConstructor
+@AllArgsConstructor
 @Table("telegram_user")
 public class TelegramUserEntity {
 
