@@ -25,4 +25,3 @@ hermes:
 logging:
     level:
         chegur.hermes.analytics: INFO
-        chegur.hermes.analytics.consumer.TelegramMessageKafkaConsumer: DEBUG

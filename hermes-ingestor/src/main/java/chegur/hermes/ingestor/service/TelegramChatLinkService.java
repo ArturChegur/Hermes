@@ -61,5 +61,3 @@ public class TelegramChatLinkService {
       .encodeToString(bytes);
   }
 }
-
-
