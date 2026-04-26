@@ -1,0 +1,248 @@
+:root {
+    --bg: #0f1424;
+    --bg-soft: #151d33;
+    --card: #1b2642;
+    --border: rgba(163, 183, 255, 0.24);
+    --text: #ecf2ff;
+    --muted: #b7bfd7;
+    --accent: #66d9ff;
+    --accent-soft: rgba(102, 217, 255, 0.14);
+    --success: #8cf1b7;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Inter, "Segoe UI", sans-serif;
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+    background-color: #0d1425;
+}
+
+body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    background:
+            radial-gradient(circle at 15% 0%, rgba(102, 217, 255, 0.14), transparent 42%),
+            radial-gradient(circle at 100% 0%, rgba(140, 241, 183, 0.09), transparent 40%),
+            linear-gradient(160deg, #18253e 0%, #111a2f 48%, #0d1425 100%);
+    background-repeat: no-repeat;
+    background-size: cover;
+    pointer-events: none;
+}
+
+.container {
+    width: min(1160px, 94%);
+    margin: 28px auto 40px;
+    display: grid;
+    gap: 18px;
+    position: relative;
+    z-index: 1;
+}
+
+.card {
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.01));
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 20px;
+    backdrop-filter: blur(4px);
+}
+
+.hero h1 {
+    margin: 0 0 8px;
+    font-size: clamp(1.4rem, 1.8vw, 2rem);
+}
+
+.subtitle,
+.meta,
+.link-line {
+    margin: 4px 0;
+    color: var(--muted);
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 12px;
+}
+
+.stat-item {
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 14px;
+    background: var(--accent-soft);
+}
+
+.stat-item .label {
+    display: block;
+    color: var(--muted);
+    font-size: .85rem;
+    margin-bottom: 8px;
+}
+
+.stat-item strong {
+    font-size: 1.5rem;
+    color: var(--success);
+}
+
+h2 {
+    margin-top: 0;
+}
+
+.table-wrap {
+    overflow: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th, td {
+    padding: 11px;
+    border-bottom: 1px solid var(--border);
+    text-align: left;
+    white-space: nowrap;
+}
+
+th {
+    color: var(--muted);
+    font-weight: 600;
+}
+
+tbody tr:hover {
+    background: rgba(255, 255, 255, 0.03);
+}
+
+tbody tr.selected {
+    background: rgba(140, 241, 183, 0.12);
+}
+
+a {
+    color: var(--accent);
+    text-decoration: none;
+    font-weight: 600;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+.user-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.chart-box {
+    margin-top: 16px;
+    height: 340px;
+}
+
+.chart-box canvas {
+    width: 100%;
+    height: 100%;
+}
+
+.chat-chart-card {
+    margin-bottom: 26px;
+}
+
+.container-centered {
+    min-height: calc(100vh - 68px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.container-404 {
+    min-height: 100vh;
+    width: 100%;
+    margin: 0;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    z-index: 1;
+}
+
+.bot-banner {
+    position: absolute;
+    top: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 1px solid rgba(102, 217, 255, 0.45);
+    background: rgba(102, 217, 255, 0.12);
+    color: #d8f6ff;
+    padding: 10px 18px;
+    border-radius: 999px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    box-shadow: 0 10px 28px rgba(2, 8, 24, 0.34);
+}
+
+.card-404 {
+    width: 100%;
+    max-width: 760px;
+}
+
+.card-empty-centered {
+    text-align: center;
+    max-width: 760px;
+}
+
+.card-empty-centered h1 {
+    margin: 0;
+    font-size: clamp(3.2rem, 10vw, 6.2rem);
+    line-height: 1;
+    color: var(--accent);
+}
+
+.card-empty-centered h2 {
+    margin: 12px 0 10px;
+    font-size: clamp(1.4rem, 3.2vw, 2.2rem);
+}
+
+.card-empty-centered p {
+    margin: 0;
+    color: var(--muted);
+    font-size: 1.05rem;
+}
+
+@media (max-width: 760px) {
+    .card {
+        padding: 16px;
+    }
+
+    th, td {
+        padding: 9px;
+    }
+
+    .chart-box {
+        height: 280px;
+    }
+
+    .chat-chart-card {
+        margin-bottom: 18px;
+    }
+
+    .container-404 {
+        padding: 16px;
+    }
+
+    .bot-banner {
+        top: 16px;
+        font-size: 0.95rem;
+        padding: 8px 14px;
+    }
+}
