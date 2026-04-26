@@ -1,0 +1,115 @@
+services:
+  postgres:
+    image: postgres:17-alpine
+    container_name: hermes-postgres
+    environment:
+      POSTGRES_DB: hermes
+      POSTGRES_USER: hermes
+      POSTGRES_PASSWORD: hermes
+    ports:
+      - "5433:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U hermes -d hermes"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  kafka:
+    image: confluentinc/cp-kafka:7.6.1
+    container_name: hermes-kafka
+    environment:
+      CLUSTER_ID: MkU3OEVBNTcwNTJENDM2Qk
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,CONTROLLER://0.0.0.0:9093
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+    ports:
+      - "9092:9092"
+    healthcheck:
+      test: ["CMD-SHELL", "bash -ec 'echo > /dev/tcp/localhost/9092'"]
+      interval: 10s
+      timeout: 5s
+      retries: 20
+    restart: unless-stopped
+
+  hermes-ingestor:
+    container_name: hermes-ingestor
+    build:
+      context: .
+      dockerfile: hermes-ingestor/Dockerfile
+    env_file:
+      - .env
+    depends_on:
+      kafka:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+      hermes-analytics:
+        condition: service_started
+    ports:
+      - "8081:8081"
+    environment:
+      DB_URL: ${DB_URL}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      UPDATES_KAFKA_TOPIC: ${UPDATES_KAFKA_TOPIC}
+      TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN}
+      TELEGRAM_BOT_USERNAME: ${TELEGRAM_BOT_USERNAME}
+      HOST_BASE_URL: ${HOST_BASE_URL}
+    restart: unless-stopped
+
+  hermes-analytics:
+    container_name: hermes-analytics
+    build:
+      context: .
+      dockerfile: hermes-analytics/Dockerfile
+    env_file:
+      - .env
+    depends_on:
+      postgres:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+    ports:
+      - "8082:8082"
+    environment:
+      DB_URL: ${DB_URL}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      UPDATES_KAFKA_TOPIC: ${UPDATES_KAFKA_TOPIC}
+      CONSUMER_GROUP_ID: ${CONSUMER_GROUP_ID}
+    restart: unless-stopped
+
+  hermes-frontend:
+    container_name: hermes-frontend
+    build:
+      context: .
+      dockerfile: hermes-frontend/Dockerfile
+    env_file:
+      - .env
+    depends_on:
+      postgres:
+        condition: service_healthy
+      hermes-analytics:
+        condition: service_started
+    ports:
+      - "8080:8080"
+    environment:
+      DB_URL: ${DB_URL}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
