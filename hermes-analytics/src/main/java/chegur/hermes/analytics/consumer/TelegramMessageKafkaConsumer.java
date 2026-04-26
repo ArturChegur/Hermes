@@ -1,7 +1,6 @@
 package chegur.hermes.analytics.consumer;
 
 import chegur.hermes.analytics.dto.TelegramMessageEvent;
-import chegur.hermes.analytics.properties.KafkaAnalyticsProperties;
 import chegur.hermes.analytics.service.TelegramMessagePersistenceService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -16,11 +15,9 @@ public class TelegramMessageKafkaConsumer {
 
   private final TelegramMessagePersistenceService persistenceService;
 
-  private final KafkaAnalyticsProperties kafkaAnalyticsProperties;
-
   @KafkaListener(
-    topics = "#{@kafkaAnalyticsProperties.updatesTopic}",
-    groupId = "#{@kafkaAnalyticsProperties.consumerGroupId}",
+    topics = "${hermes.kafka.updates-topic}",
+    groupId = "${hermes.kafka.consumer-group-id}",
     containerFactory = "telegramKafkaListenerContainerFactory"
   )
   public void consume(TelegramMessageEvent event, Acknowledgment acknowledgment) {

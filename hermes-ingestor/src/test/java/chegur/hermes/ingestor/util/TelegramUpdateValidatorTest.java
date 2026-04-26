@@ -44,6 +44,42 @@ class TelegramUpdateValidatorTest {
   }
 
   @Test
+  void isCommandMessageShouldReturnTrueForSlashCommandEntity() {
+    MessageEntity messageEntity = new MessageEntity("bot_command", 0, "/getlink".length());
+    Update update = updateWithTextAndEntities("/getlink", List.of(messageEntity));
+
+    assertThat(TelegramUpdateValidator.isCommandMessage(update)).isTrue();
+  }
+
+  @Test
+  void isCommandMessageShouldReturnTrueForCommandWithBotMention() {
+    String commandText = "/getlink@Gazerbeam";
+    MessageEntity messageEntity = new MessageEntity("bot_command", 0, commandText.length());
+    Update update = updateWithTextAndEntities(commandText, List.of(messageEntity));
+
+    assertThat(TelegramUpdateValidator.isCommandMessage(update)).isTrue();
+  }
+
+  @Test
+  void extractKnownCommandShouldReturnNormalizedCommandForSlashCommand() {
+    MessageEntity messageEntity = new MessageEntity("bot_command", 0, "/getlink".length());
+    Update update = updateWithTextAndEntities("/getlink", List.of(messageEntity));
+
+    assertThat(TelegramUpdateValidator.extractKnownCommand(update))
+      .contains("getlink");
+  }
+
+  @Test
+  void extractKnownCommandShouldReturnNormalizedCommandForMentionedCommand() {
+    String commandText = "/getlink@Gazerbeam";
+    MessageEntity messageEntity = new MessageEntity("bot_command", 0, commandText.length());
+    Update update = updateWithTextAndEntities(commandText, List.of(messageEntity));
+
+    assertThat(TelegramUpdateValidator.extractKnownCommand(update))
+      .contains("getlink");
+  }
+
+  @Test
   void isCommandMessageShouldReturnFalseWhenEntityTypeIsNotCommand() {
     MessageEntity messageEntity = new MessageEntity("mention", 0, "@hermes".length());
     Update update = updateWithTextAndEntities("@hermes", List.of(messageEntity));

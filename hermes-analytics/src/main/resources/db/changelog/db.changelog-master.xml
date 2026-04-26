@@ -10,4 +10,5 @@
     <include file="db/changelog/changes/002-create-telegram-user.xml"/>
     <include file="db/changelog/changes/003-create-telegram-chat.xml"/>
     <include file="db/changelog/changes/004-create-telegram-message.xml"/>
+    <include file="db/changelog/changes/005-create-telegram-stats-views.xml"/>
 </databaseChangeLog>

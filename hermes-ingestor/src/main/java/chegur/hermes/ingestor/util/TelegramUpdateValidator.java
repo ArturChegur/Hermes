@@ -3,6 +3,7 @@ package chegur.hermes.ingestor.util;
 import chegur.hermes.ingestor.command.BotCommands;
 
 import java.util.List;
+import java.util.Optional;
 
 import lombok.experimental.UtilityClass;
 import org.springframework.util.StringUtils;
@@ -22,43 +23,68 @@ public final class TelegramUpdateValidator {
   }
 
   public static boolean isCommandMessage(Update update) {
+    return extractKnownCommand(update).isPresent();
+  }
+
+  public static Optional<String> extractKnownCommand(Update update) {
     if (hasTextMessage(update)) {
-      return false;
+      return Optional.empty();
     }
 
     Message message = update.getMessage();
     List<MessageEntity> entities = message.getEntities();
 
     if (entities == null || entities.isEmpty()) {
-      return false;
+      return Optional.empty();
     }
 
     MessageEntity firstEntity = entities.getFirst();
     if (firstEntity == null) {
-      return false;
+      return Optional.empty();
     }
 
     if (!"bot_command".equals(firstEntity.getType())) {
-      return false;
+      return Optional.empty();
     }
 
     if (firstEntity.getOffset() != 0) {
-      return false;
+      return Optional.empty();
     }
 
     String text = message.getText();
     int endIndex = firstEntity.getOffset() + firstEntity.getLength();
 
     if (endIndex <= 0 || endIndex > text.length()) {
-      return false;
+      return Optional.empty();
     }
 
-    String command = text.substring(0, endIndex);
-    if (!StringUtils.hasText(command)) {
-      return false;
+    String rawCommand = text.substring(0, endIndex);
+    if (!StringUtils.hasText(rawCommand)) {
+      return Optional.empty();
     }
 
-    return isKnownCommand(command);
+    String normalizedCommand = normalizeCommand(rawCommand);
+
+    if (!isKnownCommand(normalizedCommand)) {
+      return Optional.empty();
+    }
+
+    return Optional.of(normalizedCommand);
+  }
+
+  private static String normalizeCommand(String command) {
+    String normalized = command.trim();
+
+    if (normalized.startsWith("/")) {
+      normalized = normalized.substring(1);
+    }
+
+    int mentionSeparatorIndex = normalized.indexOf('@');
+    if (mentionSeparatorIndex > 0) {
+      normalized = normalized.substring(0, mentionSeparatorIndex);
+    }
+
+    return normalized;
   }
 
   private static boolean isKnownCommand(String command) {

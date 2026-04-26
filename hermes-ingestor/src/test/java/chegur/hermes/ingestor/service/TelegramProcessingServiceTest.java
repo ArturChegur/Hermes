@@ -50,6 +50,26 @@ class TelegramProcessingServiceTest {
   }
 
   @Test
+  void processUpdateShouldRouteSlashGetLinkCommandAndIngestUpdate() {
+    Update update = commandUpdate("/getlink");
+
+    telegramProcessingService.processUpdate(update);
+
+    verify(botCommandOperations).getStatisticLinkForCurrentChat(update);
+    verify(telegramUpdateKafkaProducer).ingest(update);
+  }
+
+  @Test
+  void processUpdateShouldRouteMentionedGetLinkCommandAndIngestUpdate() {
+    Update update = commandUpdate("/getlink@Gazerbeam");
+
+    telegramProcessingService.processUpdate(update);
+
+    verify(botCommandOperations).getStatisticLinkForCurrentChat(update);
+    verify(telegramUpdateKafkaProducer).ingest(update);
+  }
+
+  @Test
   void processUpdateShouldIngestNonCommandTextMessage() {
     Update update = plainTextUpdate("hello");
 

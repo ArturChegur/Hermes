@@ -8,16 +8,13 @@ import chegur.hermes.ingestor.util.TelegramUpdateValidator;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.function.Consumer;
 
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.telegram.telegrambots.meta.api.objects.MessageEntity;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.commands.BotCommand;
-import org.telegram.telegrambots.meta.api.objects.message.Message;
 
 @Slf4j
 @Service
@@ -47,21 +44,17 @@ public class TelegramProcessingService {
       return;
     }
 
-    if (TelegramUpdateValidator.isCommandMessage(update)) {
-      String command = extractCommand(update).orElseThrow();
-      commandHandlers.get(command).accept(update);
-    }
+    TelegramUpdateValidator.extractKnownCommand(update)
+      .ifPresent(command -> {
+        Consumer<Update> handler = commandHandlers.get(command);
+        if (handler == null) {
+          log.warn("No handler registered for command: {}", command);
+          return;
+        }
+
+        handler.accept(update);
+      });
 
     telegramUpdateKafkaProducer.ingest(update);
-  }
-
-  private Optional<String> extractCommand(Update update) {
-    Message message = update.getMessage();
-    MessageEntity firstEntity = message.getEntities().getFirst();
-
-    String rawCommand = message.getText()
-      .substring(firstEntity.getOffset(), firstEntity.getOffset() + firstEntity.getLength());
-
-    return Optional.of(rawCommand);
   }
 }
