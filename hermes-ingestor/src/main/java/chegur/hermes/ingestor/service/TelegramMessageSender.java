@@ -23,7 +23,7 @@ public class TelegramMessageSender {
     try {
       telegramClient.execute(sendMessage);
     } catch (TelegramApiException e) {
-      log.error("Failed to send telegram link message. chatId = {}, error = {}", chatId, e.getMessage());
+      log.error("Failed to send telegram link message. chatId = {}", chatId, e);
       throw new IllegalStateException("Failed to send telegram message", e);
     }
   }

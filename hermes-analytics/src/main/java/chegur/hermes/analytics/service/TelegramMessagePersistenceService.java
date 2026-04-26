@@ -33,10 +33,6 @@ public class TelegramMessagePersistenceService {
     TelegramChatEntity chat = upsertChat(event);
     TelegramUserEntity user = upsertUser(event);
 
-    if (messageAlreadyExists(event, chat.getId())) {
-      return;
-    }
-
     TelegramMessageEntity message = TelegramMessageEntity.builder()
       .telegramUpdateId(event.getUpdateId())
       .telegramMessageId(event.getMessageId())
@@ -81,14 +77,5 @@ public class TelegramMessagePersistenceService {
         .build());
 
     return telegramChatRepository.save(chat);
-  }
-
-  private boolean messageAlreadyExists(TelegramMessageEvent event, Long chatRef) {
-    if (event.getUpdateId() != null
-      && telegramMessageRepository.findByTelegramUpdateId(event.getUpdateId()).isPresent()) {
-      return true;
-    }
-
-    return event.getMessageId() != null && telegramMessageRepository.findByChatRefAndTelegramMessageId(chatRef, event.getMessageId()).isPresent();
   }
 }

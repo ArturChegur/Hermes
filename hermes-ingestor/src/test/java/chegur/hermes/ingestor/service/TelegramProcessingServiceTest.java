@@ -40,33 +40,33 @@ class TelegramProcessingServiceTest {
   }
 
   @Test
-  void processUpdateShouldRouteGetLinkCommandAndIngestUpdate() {
+  void processUpdateShouldRouteGetLinkCommandAndSkipIngestion() {
     Update update = commandUpdate("getlink");
 
     telegramProcessingService.processUpdate(update);
 
     verify(botCommandOperations).getStatisticLinkForCurrentChat(update);
-    verify(telegramUpdateKafkaProducer).ingest(update);
+    verify(telegramUpdateKafkaProducer, never()).ingest(update);
   }
 
   @Test
-  void processUpdateShouldRouteSlashGetLinkCommandAndIngestUpdate() {
+  void processUpdateShouldRouteSlashGetLinkCommandAndSkipIngestion() {
     Update update = commandUpdate("/getlink");
 
     telegramProcessingService.processUpdate(update);
 
     verify(botCommandOperations).getStatisticLinkForCurrentChat(update);
-    verify(telegramUpdateKafkaProducer).ingest(update);
+    verify(telegramUpdateKafkaProducer, never()).ingest(update);
   }
 
   @Test
-  void processUpdateShouldRouteMentionedGetLinkCommandAndIngestUpdate() {
+  void processUpdateShouldRouteMentionedGetLinkCommandAndSkipIngestion() {
     Update update = commandUpdate("/getlink@Gazerbeam");
 
     telegramProcessingService.processUpdate(update);
 
     verify(botCommandOperations).getStatisticLinkForCurrentChat(update);
-    verify(telegramUpdateKafkaProducer).ingest(update);
+    verify(telegramUpdateKafkaProducer, never()).ingest(update);
   }
 
   @Test
