@@ -8,6 +8,8 @@ import chegur.hermes.ingestor.util.TelegramUpdateValidator;
 
 import java.util.Map;
 
+import java.util.Optional;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -28,7 +30,9 @@ public class TelegramProcessingService {
     }
 
     TelegramUpdateValidator.extractKnownCommand(update)
-      .map(BotCommands::valueOf)
+      .map(BotCommands::getByName)
+      .filter((Optional::isPresent))
+      .map(Optional::get)
       .map(commandHandlers::get)
       .ifPresent(botCommandHandler -> botCommandHandler.handle(update));
 
