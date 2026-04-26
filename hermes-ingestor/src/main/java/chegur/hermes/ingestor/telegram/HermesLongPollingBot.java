@@ -1,22 +1,22 @@
 package chegur.hermes.ingestor.telegram;
 
-import chegur.hermes.ingestor.configuration.TelegramClientConfiguration;
 import chegur.hermes.ingestor.properties.TelegramBotProperties;
 
 import chegur.hermes.ingestor.service.TelegramProcessingService;
 
+import java.util.List;
 import java.util.Objects;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import org.telegram.telegrambots.client.okhttp.OkHttpTelegramClient;
 import org.telegram.telegrambots.longpolling.BotSession;
 import org.telegram.telegrambots.longpolling.starter.AfterBotRegistration;
 import org.telegram.telegrambots.longpolling.starter.SpringLongPollingBot;
 import org.telegram.telegrambots.longpolling.util.LongPollingSingleThreadUpdateConsumer;
 import org.telegram.telegrambots.meta.api.methods.commands.SetMyCommands;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.api.objects.commands.BotCommand;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
 
@@ -30,6 +30,8 @@ public class HermesLongPollingBot implements SpringLongPollingBot {
   private final TelegramProcessingService telegramProcessingService;
 
   private final TelegramClient telegramClient;
+
+  private final List<BotCommand> botCommands;
 
   @Override
   public String getBotToken() {
@@ -45,7 +47,7 @@ public class HermesLongPollingBot implements SpringLongPollingBot {
   public void configureCommands(BotSession ignoredSession) {
     try {
       SetMyCommands commands = SetMyCommands.builder()
-        .commands(telegramProcessingService.getBotCommands())
+        .commands(botCommands)
         .build();
 
       telegramClient.execute(commands);

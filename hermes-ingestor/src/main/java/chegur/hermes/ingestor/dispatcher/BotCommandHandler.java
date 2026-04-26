@@ -1,22 +1,11 @@
 package chegur.hermes.ingestor.dispatcher;
 
-import chegur.hermes.ingestor.service.TelegramChatLinkService;
-import chegur.hermes.ingestor.service.TelegramMessageSender;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
+import chegur.hermes.ingestor.command.BotCommands;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
-@Service
-@RequiredArgsConstructor
-public class BotCommandHandler implements BotCommandOperations {
+public interface BotCommandHandler {
 
-  private final TelegramChatLinkService telegramChatLinkService;
+  void handle(Update update);
 
-  private final TelegramMessageSender telegramMessageSender;
-
-  @Override
-  public void getStatisticLinkForCurrentChat(Update update) {
-    String chatLink = telegramChatLinkService.createLink(update.getMessage().getChatId());
-    telegramMessageSender.sendMessage(update.getMessage().getChatId(), chatLink);
-  }
+  BotCommands getCommand();
 }

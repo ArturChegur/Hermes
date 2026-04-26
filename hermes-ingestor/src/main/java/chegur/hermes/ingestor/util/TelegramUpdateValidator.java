@@ -89,8 +89,8 @@ public final class TelegramUpdateValidator {
   }
 
   private static boolean isKnownCommand(String command) {
-    for (BotCommands botCommand : BotCommands.values()) {
-      if (botCommand.getValue().equals(command)) {
+    for (BotCommands botCommands : BotCommands.values()) {
+      if (botCommands.getValue().equals(command)) {
         return true;
       }
     }
