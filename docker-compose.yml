@@ -93,7 +93,7 @@ services:
       DLQ_KAFKA_TOPIC: ${DLQ_KAFKA_TOPIC}
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
     healthcheck:
-      test: ["CMD-SHELL", "bash -ec 'echo > /dev/tcp/localhost/8082'"]
+      test: ["CMD-SHELL", "kill -0 1"]
       interval: 10s
       timeout: 5s
       retries: 20

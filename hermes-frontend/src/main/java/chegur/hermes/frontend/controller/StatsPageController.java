@@ -1,6 +1,6 @@
 package chegur.hermes.frontend.controller;
 
-import chegur.hermes.frontend.controller.exception.PageNotFoundException;
+import chegur.hermes.frontend.exception.PageNotFoundException;
 import chegur.hermes.frontend.dto.ChatPageDataDto;
 import chegur.hermes.frontend.dto.UserPageDataDto;
 import chegur.hermes.frontend.service.ChatStatisticsService;
@@ -16,13 +16,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 @RequiredArgsConstructor
 public class StatsPageController {
 
-  private static final String TELEGRAM_BOT_USERNAME_PROPERTY = "${TELEGRAM_BOT_USERNAME:HermesBot}";
-
-  private static final String DEFAULT_BOT_USERNAME = "UNNAMED_BOT";
-
   private final ChatStatisticsService statisticsService;
 
-  @Value(TELEGRAM_BOT_USERNAME_PROPERTY)
+  @Value("${TELEGRAM_BOT_USERNAME}")
   private String botUsername;
 
   @ModelAttribute("botUsername")
@@ -68,7 +64,7 @@ public class StatsPageController {
 
   private String normalizeBotUsername(String username) {
     if (username == null || username.isBlank()) {
-      return DEFAULT_BOT_USERNAME;
+      return "UNNAMED_BOT";
     }
 
     String trimmed = username.trim();

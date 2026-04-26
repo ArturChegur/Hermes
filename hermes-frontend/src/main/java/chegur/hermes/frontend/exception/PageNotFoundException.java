@@ -1,4 +1,4 @@
-package chegur.hermes.frontend.controller.exception;
+package chegur.hermes.frontend.exception;
 
 public class PageNotFoundException extends RuntimeException {
 
