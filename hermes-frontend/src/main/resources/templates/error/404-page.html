@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hermes — 404</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body>
+<main class="container-404">
+    <div class="bot-banner" th:text="${botUsername}">@HermesBot</div>
+
+    <section class="card card-empty card-empty-centered card-404">
+        <h1>404</h1>
+        <h2>Страница не найдена</h2>
+        <p>Ссылка недействительна, не найдена в базе или имеет неверный формат.</p>
+    </section>
+</main>
+</body>
+</html>

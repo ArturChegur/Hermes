@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hermes — Статистика чата</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+<main class="container" th:if="${chatStats != null}">
+    <section class="card hero">
+        <h1 th:text="${chatStats.chatTitle != null ? chatStats.chatTitle : 'Без названия'}">Название чата</h1>
+        <p class="subtitle">
+            <span th:text="'Chat ID: ' + ${chatStats.telegramChatId}">Chat ID: 0</span>
+            <span th:if="${chatStats.chatUsername != null and !#strings.isEmpty(chatStats.chatUsername)}"
+                  th:text="' • @' + ${chatStats.chatUsername}"> • @username</span>
+            <span th:if="${chatStats.chatType != null}"
+                  th:text="' • Тип: ' + ${chatStats.chatType}"> • Тип: group</span>
+        </p>
+        <p class="link-line" th:text="'Ссылка: /' + ${chatLink}">Ссылка: /code</p>
+        <p class="meta" th:if="${linkCreatedAt != null}"
+           th:text="'Создана: ' + ${#temporals.format(linkCreatedAt, 'dd.MM.yyyy HH:mm')}">Создана: 01.01.2026 12:00</p>
+    </section>
+
+    <section class="stats-grid card">
+        <article class="stat-item">
+            <span class="label">Сообщений за всё время</span>
+            <strong th:text="${chatStats.totalMessages}">0</strong>
+        </article>
+        <article class="stat-item">
+            <span class="label">За последние 24 часа</span>
+            <strong th:text="${chatStats.messagesLast24Hours}">0</strong>
+        </article>
+        <article class="stat-item">
+            <span class="label">За последний час</span>
+            <strong th:text="${chatStats.messagesLast1Hour}">0</strong>
+        </article>
+        <article class="stat-item">
+            <span class="label">Участников</span>
+            <strong th:text="${chatStats.participantsCount}">0</strong>
+        </article>
+    </section>
+
+    <section class="card chat-chart-card">
+        <div class="chart-box" th:if="${chatHourlyPoints != null}">
+            <h3>График сообщений чата за неделю (по часам)</h3>
+            <canvas id="chatHourlyChart"></canvas>
+        </div>
+    </section>
+
+    <section class="card" th:if="${!#lists.isEmpty(participants)}">
+        <h2>Участники</h2>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                <tr>
+                    <th>Пользователь</th>
+                    <th>ID</th>
+                    <th>Всего</th>
+                    <th>24 часа</th>
+                    <th>1 час</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="p : ${participants}">
+                    <td>
+                        <a th:href="@{/{chatLink}/{userId}(chatLink=${chatLink}, userId=${p.telegramUserId})}"
+                           th:text="${p.displayName}">user</a>
+                    </td>
+                    <td th:text="${p.telegramUserId}">0</td>
+                    <td th:text="${p.totalMessages}">0</td>
+                    <td th:text="${p.messagesLast24Hours}">0</td>
+                    <td th:text="${p.messagesLast1Hour}">0</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        (function () {
+            const points = /*[[${chatHourlyPoints}]]*/ null;
+            if (!Array.isArray(points) || points.length === 0) {
+                return;
+            }
+
+            const canvas = document.getElementById('chatHourlyChart');
+            if (!canvas) {
+                return;
+            }
+
+            const labels = points.map(point => {
+                const raw = point.hourStart ?? point.hour_start;
+                const dt = raw ? new Date(raw) : null;
+                if (!dt || Number.isNaN(dt.getTime())) {
+                    return '';
+                }
+                return dt.toLocaleString('ru-RU', {
+                    day: '2-digit',
+                    month: '2-digit',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    hour12: false,
+                    timeZone: 'UTC'
+                });
+            });
+
+            const values = points.map(point => point.messagesCount ?? point.messages_count ?? 0);
+
+            new Chart(canvas, {
+                type: 'line',
+                data: {
+                    labels,
+                    datasets: [{
+                        label: 'Сообщений в час',
+                        data: values,
+                        borderColor: '#66d9ff',
+                        backgroundColor: 'rgba(102, 217, 255, 0.2)',
+                        borderWidth: 2,
+                        fill: true,
+                        tension: 0.25,
+                        pointRadius: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            ticks: {
+                                maxTicksLimit: 14,
+                                color: '#b7bfd7'
+                            },
+                            grid: {display: false}
+                        },
+                        y: {
+                            beginAtZero: true,
+                            ticks: {precision: 0, color: '#b7bfd7'},
+                            grid: {color: 'rgba(255,255,255,0.08)'}
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            labels: {color: '#e8edff'}
+                        }
+                    }
+                }
+            });
+        })();
+        /*]]>*/
+    </script>
+
+</main>
+</body>
+</html>

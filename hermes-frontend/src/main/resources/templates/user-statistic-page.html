@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hermes — Статистика пользователя</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+<main class="container" th:if="${chatStats != null and userStats != null}">
+    <section class="card hero">
+        <h1 th:text="'Пользователь: ' + ${userStats.displayName}">Пользователь</h1>
+        <p class="subtitle">
+            <span th:text="'Chat ID: ' + ${chatStats.telegramChatId}">Chat ID: 0</span>
+            <span th:text="' • User ID: ' + ${userStats.telegramUserId}"> • User ID: 0</span>
+        </p>
+        <a class="back-link" th:href="@{/{chatLink}(chatLink=${chatLink})}">← К статистике чата</a>
+    </section>
+
+    <section class="stats-grid card">
+        <article class="stat-item">
+            <span class="label">Сообщений за всё время</span>
+            <strong th:text="${userStats.totalMessages}">0</strong>
+        </article>
+        <article class="stat-item">
+            <span class="label">За последние 24 часа</span>
+            <strong th:text="${userStats.messagesLast24Hours}">0</strong>
+        </article>
+        <article class="stat-item">
+            <span class="label">За последний час</span>
+            <strong th:text="${userStats.messagesLast1Hour}">0</strong>
+        </article>
+    </section>
+
+    <section class="card">
+        <div class="chart-box" th:if="${hourlyPoints != null}">
+            <h3>График сообщений за неделю (по часам)</h3>
+            <canvas id="userHourlyChart"></canvas>
+        </div>
+    </section>
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        (function () {
+            const points = /*[[${hourlyPoints}]]*/ null;
+            if (!Array.isArray(points) || points.length === 0) {
+                return;
+            }
+
+            const canvas = document.getElementById('userHourlyChart');
+            if (!canvas) {
+                return;
+            }
+
+            const labels = points.map(point => {
+                const raw = point.hourStart ?? point.hour_start;
+                const dt = raw ? new Date(raw) : null;
+                if (!dt || Number.isNaN(dt.getTime())) {
+                    return '';
+                }
+                return dt.toLocaleString('ru-RU', {
+                    day: '2-digit',
+                    month: '2-digit',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    hour12: false,
+                    timeZone: 'UTC'
+                });
+            });
+
+            const values = points.map(point => point.messagesCount ?? point.messages_count ?? 0);
+
+            new Chart(canvas, {
+                type: 'line',
+                data: {
+                    labels,
+                    datasets: [{
+                        label: 'Сообщений в час',
+                        data: values,
+                        borderColor: '#66d9ff',
+                        backgroundColor: 'rgba(102, 217, 255, 0.2)',
+                        borderWidth: 2,
+                        fill: true,
+                        tension: 0.25,
+                        pointRadius: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            ticks: {
+                                maxTicksLimit: 14,
+                                color: '#b7bfd7'
+                            },
+                            grid: {display: false}
+                        },
+                        y: {
+                            beginAtZero: true,
+                            ticks: {precision: 0, color: '#b7bfd7'},
+                            grid: {color: 'rgba(255,255,255,0.08)'}
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            labels: {color: '#e8edff'}
+                        }
+                    }
+                }
+            });
+        })();
+        /*]]>*/
+    </script>
+</main>
+</body>
+</html>
