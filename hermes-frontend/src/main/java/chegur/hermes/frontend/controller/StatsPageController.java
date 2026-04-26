@@ -1,5 +1,6 @@
 package chegur.hermes.frontend.controller;
 
+import chegur.hermes.frontend.controller.exception.PageNotFoundException;
 import chegur.hermes.frontend.dto.ChatPageDataDto;
 import chegur.hermes.frontend.dto.UserPageDataDto;
 import chegur.hermes.frontend.service.ChatStatisticsService;
@@ -34,9 +35,9 @@ public class StatsPageController {
     return statisticsService.getChatPage(chatLink)
       .map(data -> {
         fillCommonModel(model, data, null);
-        return "index";
+        return "chat-statistic-page";
       })
-      .orElse("error/404");
+      .orElseThrow(() -> new PageNotFoundException("Chat page not found for link: " + chatLink));
   }
 
   @GetMapping("/{chatLink:[A-Za-z0-9_-]+}/{userId:\\d+}")
@@ -44,9 +45,9 @@ public class StatsPageController {
     return statisticsService.getUserPage(chatLink, userId)
       .map(data -> {
         fillCommonModel(model, data.getChatPage(), data);
-        return "user";
+        return "user-statistic-page";
       })
-      .orElse("error/404");
+      .orElseThrow(() -> new PageNotFoundException("User page not found for link: " + chatLink + ", userId: " + userId));
   }
 
   private void fillCommonModel(Model model, ChatPageDataDto chatData, UserPageDataDto userData) {
