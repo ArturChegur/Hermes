@@ -56,7 +56,6 @@
                 <thead>
                 <tr>
                     <th>Пользователь</th>
-                    <th>ID</th>
                     <th>Всего</th>
                     <th>24 часа</th>
                     <th>1 час</th>
@@ -68,7 +67,6 @@
                         <a th:href="@{/{chatLink}/{userId}(chatLink=${chatLink}, userId=${p.telegramUserId})}"
                            th:text="${p.displayName}">user</a>
                     </td>
-                    <td th:text="${p.telegramUserId}">0</td>
                     <td th:text="${p.totalMessages}">0</td>
                     <td th:text="${p.messagesLast24Hours}">0</td>
                     <td th:text="${p.messagesLast1Hour}">0</td>
