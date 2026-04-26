@@ -57,6 +57,7 @@ class TelegramChatLinkServiceTest {
     Long chatId = 202L;
 
     when(frontendLinkProperties.getBaseUrl()).thenReturn("https://frontend");
+    when(frontendLinkProperties.getLinkTtlMinutes()).thenReturn(60);
     when(repository.findActiveByChatId(eq(chatId), any(LocalDateTime.class))).thenReturn(Optional.empty());
     when(repository.save(any(TelegramChatLinkEntity.class))).thenAnswer(invocation -> invocation.getArgument(0));
 

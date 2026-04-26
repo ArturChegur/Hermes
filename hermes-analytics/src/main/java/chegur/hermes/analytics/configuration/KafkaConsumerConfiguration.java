@@ -1,10 +1,13 @@
 package chegur.hermes.analytics.configuration;
 
 import chegur.hermes.analytics.dto.TelegramMessageEvent;
+import chegur.hermes.analytics.properties.KafkaAnalyticsProperties;
 
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.kafka.clients.consumer.ConsumerRecord;
+import org.apache.kafka.common.TopicPartition;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
@@ -13,10 +16,13 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.annotation.EnableKafka;
 import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.core.ConsumerFactory;
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
+import org.springframework.kafka.listener.ConsumerRecordRecoverer;
 import org.springframework.kafka.listener.ContainerProperties;
 import org.springframework.kafka.listener.DefaultErrorHandler;
+import org.springframework.kafka.listener.DeadLetterPublishingRecoverer;
 import org.springframework.kafka.support.serializer.ErrorHandlingDeserializer;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
 import org.springframework.util.backoff.FixedBackOff;
@@ -45,21 +51,33 @@ public class KafkaConsumerConfiguration {
   }
 
   @Bean
-  public ConcurrentKafkaListenerContainerFactory<String, TelegramMessageEvent> telegramKafkaListenerContainerFactory(ConsumerFactory<String, TelegramMessageEvent> telegramMessageConsumerFactory) {
+  public ConcurrentKafkaListenerContainerFactory<String, TelegramMessageEvent> telegramKafkaListenerContainerFactory(ConsumerFactory<String, TelegramMessageEvent> telegramMessageConsumerFactory, DefaultErrorHandler telegramKafkaErrorHandler) {
     ConcurrentKafkaListenerContainerFactory<String, TelegramMessageEvent> factory = new ConcurrentKafkaListenerContainerFactory<>();
 
     factory.setConsumerFactory(telegramMessageConsumerFactory);
     factory.getContainerProperties().setAckMode(ContainerProperties.AckMode.MANUAL_IMMEDIATE);
-
-    DefaultErrorHandler errorHandler = new DefaultErrorHandler(
-      (record, exception) -> log.error("Skipping poisoned kafka record topic={}, partition={}, offset={} due to {}",
-        record.topic(), record.partition(), record.offset(), exception.getMessage()),
-      new FixedBackOff(3000L, 3L)
-    );
-    errorHandler.setCommitRecovered(true);
-
-    factory.setCommonErrorHandler(errorHandler);
+    factory.setCommonErrorHandler(telegramKafkaErrorHandler);
 
     return factory;
+  }
+
+  @Bean
+  public DefaultErrorHandler telegramKafkaErrorHandler(ConsumerRecordRecoverer telegramDltRecoverer) {
+    DefaultErrorHandler errorHandler = new DefaultErrorHandler(telegramDltRecoverer, new FixedBackOff(3000L, 3L));
+    errorHandler.setCommitRecovered(true);
+
+    return errorHandler;
+  }
+
+  @Bean
+  public ConsumerRecordRecoverer telegramDltRecoverer(KafkaTemplate<String, TelegramMessageEvent> kafkaTemplate, KafkaAnalyticsProperties kafkaAnalyticsProperties) {
+    DeadLetterPublishingRecoverer recoverer = new DeadLetterPublishingRecoverer(kafkaTemplate, (ConsumerRecord<?, ?> record, Exception ex) -> new TopicPartition(kafkaAnalyticsProperties.getDltTopic(), record.partition()));
+
+    return (record, exception) -> {
+      log.error("Publishing poisoned kafka record to DLQ. topic = {}, partition = {}, offset = {}, dltTopic = {}",
+        record.topic(), record.partition(), record.offset(), kafkaAnalyticsProperties.getDltTopic(), exception);
+
+      recoverer.accept(record, exception);
+    };
   }
 }

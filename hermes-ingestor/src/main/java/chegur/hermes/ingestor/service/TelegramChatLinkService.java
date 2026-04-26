@@ -18,8 +18,6 @@ public class TelegramChatLinkService {
 
   private static final int TOKEN_BYTES = 24;
 
-  private static final int TTL_MINUTES = 60;
-
   private final SecureRandom secureRandom = new SecureRandom();
 
   private final FrontendLinkProperties frontendLinkProperties;
@@ -40,7 +38,7 @@ public class TelegramChatLinkService {
       .code(generateCode())
       .chatId(chatId)
       .createdAt(now)
-      .expiresAt(now.plusMinutes(TTL_MINUTES))
+      .expiresAt(now.plusMinutes(frontendLinkProperties.getLinkTtlMinutes()))
       .build();
 
     TelegramChatLinkEntity saved = repository.save(token);

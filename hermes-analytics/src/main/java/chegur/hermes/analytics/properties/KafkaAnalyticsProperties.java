@@ -13,4 +13,6 @@ public class KafkaAnalyticsProperties {
   String updatesTopic;
 
   String consumerGroupId;
+
+  String dltTopic;
 }
