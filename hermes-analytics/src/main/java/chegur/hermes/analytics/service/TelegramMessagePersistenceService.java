@@ -7,7 +7,9 @@ import chegur.hermes.analytics.model.TelegramUserEntity;
 import chegur.hermes.analytics.repository.TelegramChatRepository;
 import chegur.hermes.analytics.repository.TelegramMessageRepository;
 import chegur.hermes.analytics.repository.TelegramUserRepository;
+
 import java.time.Instant;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

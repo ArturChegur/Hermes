@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="
+          http://www.liquibase.org/xml/ns/dbchangelog
+          https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="005-create-telegram-stats-views" author="ArturChegur">
+        <sql>
+            CREATE OR REPLACE VIEW v_chat_stats AS
+            SELECT c.id AS chat_ref,
+                   c.telegram_chat_id,
+                   c.chat_title,
+                   c.chat_username,
+                   c.chat_type,
+                   COUNT(m.id)::BIGINT                                                   AS total_messages,
+                   COUNT(m.id) FILTER ( WHERE m.message_date &gt;= NOW() - INTERVAL '24 hours')::BIGINT AS messages_last_24_hours,
+                   COUNT(m.id) FILTER ( WHERE m.message_date &gt;= NOW() - INTERVAL '1 hour')::BIGINT    AS messages_last_1_hour,
+                   COUNT(DISTINCT m.user_ref)::BIGINT                                    AS participants_count
+            FROM telegram_chat c
+                     LEFT JOIN telegram_message m ON m.chat_ref = c.id
+            GROUP BY c.id, c.telegram_chat_id, c.chat_title, c.chat_username, c.chat_type;
+        </sql>
+
+        <sql>
+            CREATE OR REPLACE VIEW v_chat_user_stats AS
+            SELECT c.id AS chat_ref,
+                   c.telegram_chat_id,
+                   u.id AS user_ref,
+                   u.telegram_user_id,
+                   COALESCE(NULLIF(u.username, ''),
+                            NULLIF(TRIM(CONCAT_WS(' ', u.first_name, u.last_name)), ''),
+                            CONCAT('User #', u.telegram_user_id::TEXT))                 AS display_name,
+                   COUNT(m.id)::BIGINT                                                   AS total_messages,
+                   COUNT(m.id) FILTER ( WHERE m.message_date &gt;= NOW() - INTERVAL '24 hours')::BIGINT AS messages_last_24_hours,
+                   COUNT(m.id) FILTER ( WHERE m.message_date &gt;= NOW() - INTERVAL '1 hour')::BIGINT    AS messages_last_1_hour
+            FROM telegram_chat c
+                     JOIN telegram_message m ON m.chat_ref = c.id AND m.user_ref IS NOT NULL
+                     JOIN telegram_user u ON u.id = m.user_ref
+            GROUP BY c.id, c.telegram_chat_id, u.id, u.telegram_user_id, u.username, u.first_name, u.last_name;
+        </sql>
+
+        <sql>
+            CREATE OR REPLACE VIEW v_chat_user_hourly_messages AS
+            SELECT m.chat_ref,
+                   c.telegram_chat_id,
+                   u.telegram_user_id,
+                   DATE_TRUNC('hour', m.message_date) AS hour_start,
+                   COUNT(m.id)::BIGINT                AS messages_count
+            FROM telegram_message m
+                     JOIN telegram_chat c ON c.id = m.chat_ref
+                     JOIN telegram_user u ON u.id = m.user_ref
+            WHERE m.user_ref IS NOT NULL
+            GROUP BY m.chat_ref, c.telegram_chat_id, u.telegram_user_id, DATE_TRUNC('hour', m.message_date);
+        </sql>
+
+        <rollback>
+            DROP VIEW IF EXISTS v_chat_user_hourly_messages;
+            DROP VIEW IF EXISTS v_chat_user_stats;
+            DROP VIEW IF EXISTS v_chat_stats;
+        </rollback>
+    </changeSet>
+
+</databaseChangeLog>
