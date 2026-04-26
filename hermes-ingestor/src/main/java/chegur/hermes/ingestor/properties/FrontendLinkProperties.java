@@ -11,4 +11,6 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 public class FrontendLinkProperties {
 
   String baseUrl;
+
+  Integer linkTtlMinutes;
 }

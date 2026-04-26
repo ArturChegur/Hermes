@@ -15,7 +15,13 @@ RUN mvn -q -pl hermes-ingestor -am clean package -DskipTests
 FROM eclipse-temurin:21-jre
 WORKDIR /app
 
+RUN groupadd --system hermes && useradd --system --gid hermes hermes
+
 COPY --from=build /build/hermes-ingestor/target/hermes-ingestor-1.0-SNAPSHOT.jar app.jar
+
+RUN chown hermes:hermes /app/app.jar
+
+USER hermes
 
 EXPOSE 8081
 

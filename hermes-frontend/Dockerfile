@@ -15,7 +15,13 @@ RUN mvn -q -pl hermes-frontend -am clean package -DskipTests
 FROM eclipse-temurin:21-jre
 WORKDIR /app
 
+RUN groupadd --system hermes && useradd --system --gid hermes hermes
+
 COPY --from=build /build/hermes-frontend/target/hermes-frontend-1.0-SNAPSHOT.jar app.jar
+
+RUN chown hermes:hermes /app/app.jar
+
+USER hermes
 
 EXPOSE 8080
 

@@ -56,7 +56,7 @@ services:
       postgres:
         condition: service_healthy
       hermes-analytics:
-        condition: service_started
+        condition: service_healthy
     ports:
       - "8081:8081"
     environment:
@@ -67,6 +67,7 @@ services:
       TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN}
       TELEGRAM_BOT_USERNAME: ${TELEGRAM_BOT_USERNAME}
       HOST_BASE_URL: ${HOST_BASE_URL}
+      LINK_TTL_MINUTES: ${LINK_TTL_MINUTES:-60}
     restart: unless-stopped
 
   hermes-analytics:
@@ -89,6 +90,13 @@ services:
       DB_PASSWORD: ${DB_PASSWORD}
       UPDATES_KAFKA_TOPIC: ${UPDATES_KAFKA_TOPIC}
       CONSUMER_GROUP_ID: ${CONSUMER_GROUP_ID}
+      DLQ_KAFKA_TOPIC: ${DLQ_KAFKA_TOPIC}
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+    healthcheck:
+      test: ["CMD-SHELL", "bash -ec 'echo > /dev/tcp/localhost/8082'"]
+      interval: 10s
+      timeout: 5s
+      retries: 20
     restart: unless-stopped
 
   hermes-frontend:
@@ -102,7 +110,7 @@ services:
       postgres:
         condition: service_healthy
       hermes-analytics:
-        condition: service_started
+        condition: service_healthy
     ports:
       - "8080:8080"
     environment:

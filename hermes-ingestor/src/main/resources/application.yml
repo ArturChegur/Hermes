@@ -25,5 +25,6 @@ telegram:
 hermes:
     frontend:
         base-url: ${HOST_BASE_URL}
+        link-ttl-minutes: ${LINK_TTL_MINUTES}
     kafka:
         updates-topic: ${UPDATES_KAFKA_TOPIC}
