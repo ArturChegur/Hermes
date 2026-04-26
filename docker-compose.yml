@@ -68,6 +68,7 @@ services:
       TELEGRAM_BOT_USERNAME: ${TELEGRAM_BOT_USERNAME}
       HOST_BASE_URL: ${HOST_BASE_URL}
       LINK_TTL_MINUTES: ${LINK_TTL_MINUTES:-60}
+      JAVA_TOOL_OPTIONS: "${JAVA_TOOL_OPTIONS:-}"
     restart: unless-stopped
 
   hermes-analytics:
@@ -92,6 +93,7 @@ services:
       CONSUMER_GROUP_ID: ${CONSUMER_GROUP_ID}
       DLQ_KAFKA_TOPIC: ${DLQ_KAFKA_TOPIC}
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      JAVA_TOOL_OPTIONS: "${JAVA_TOOL_OPTIONS:-}"
     healthcheck:
       test: ["CMD-SHELL", "kill -0 1"]
       interval: 10s
@@ -117,6 +119,7 @@ services:
       DB_URL: ${DB_URL}
       DB_USER: ${DB_USER}
       DB_PASSWORD: ${DB_PASSWORD}
+      JAVA_TOOL_OPTIONS: "${JAVA_TOOL_OPTIONS:-}"
     restart: unless-stopped
 
 volumes:

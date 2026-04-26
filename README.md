@@ -20,6 +20,9 @@ DB_URL=jdbc:postgresql://postgres:5432/hermes
 HOST_BASE_URL=http://your-server-or-domain:8080
 UPDATES_KAFKA_TOPIC=telegram-updates
 CONSUMER_GROUP_ID=hermes-analytics
+DLQ_KAFKA_TOPIC=telegram-updates-dlt
+LINK_TTL_MINUTES=60
+JAVA_TOOL_OPTIONS=-XX:+UseParallelGC -Xms256m -Xmx512m
 ```
 
 > Не коммить реальный `TELEGRAM_BOT_TOKEN` в репозиторий.
@@ -35,3 +38,7 @@ docker compose up -d --build
 - Frontend: `http://localhost:8080`
 - Ingestor: `http://localhost:8081`
 - Analytics: `http://localhost:8082`
+
+```bash
+docker compose up -d --build hermes-ingestor hermes-analytics hermes-frontend
+```
