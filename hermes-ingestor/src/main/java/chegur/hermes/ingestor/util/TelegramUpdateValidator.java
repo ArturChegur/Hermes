@@ -7,6 +7,7 @@ import java.util.Optional;
 
 import lombok.experimental.UtilityClass;
 import org.springframework.util.StringUtils;
+import org.telegram.telegrambots.meta.api.objects.EntityType;
 import org.telegram.telegrambots.meta.api.objects.MessageEntity;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.message.Message;
@@ -43,7 +44,7 @@ public final class TelegramUpdateValidator {
       return Optional.empty();
     }
 
-    if (!"bot_command".equals(firstEntity.getType())) {
+    if (!EntityType.BOTCOMMAND.equals(firstEntity.getType())) {
       return Optional.empty();
     }
 
