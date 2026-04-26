@@ -1,7 +1,7 @@
 package chegur.hermes.frontend.service;
 
-import chegur.hermes.frontend.dto.ChatPageData;
-import chegur.hermes.frontend.dto.UserPageData;
+import chegur.hermes.frontend.dto.ChatPageDataDto;
+import chegur.hermes.frontend.dto.UserPageDataDto;
 import chegur.hermes.frontend.repository.ChatParticipantStatsRepository;
 import chegur.hermes.frontend.repository.ChatStatsViewRepository;
 import chegur.hermes.frontend.repository.TelegramChatLinkStatsRepository;
@@ -24,25 +24,25 @@ public class ChatStatisticsService {
 
   private final UserHourlyMessagePointRepository hourlyMessagePointRepository;
 
-  public Optional<ChatPageData> getChatPage(String chatLink) {
+  public Optional<ChatPageDataDto> getChatPage(String chatLink) {
     return chatLinkRepository.findActiveByCode(chatLink)
       .flatMap(link -> chatStatsRepository.findByTelegramChatId(link.getTelegramChatId())
-        .map(stats -> new ChatPageData(
-          link,
-          stats,
-          participantStatsRepository.findByTelegramChatId(stats.getTelegramChatId()),
-          hourlyMessagePointRepository.findChatHourlyForWeek(stats.getTelegramChatId())
-        )));
+        .map(stats -> ChatPageDataDto.builder()
+            .link(link)
+            .chatStats(stats)
+            .participants(participantStatsRepository.findByTelegramChatId(stats.getTelegramChatId()))
+            .hourlyPoints(hourlyMessagePointRepository.findChatHourlyForWeek(stats.getTelegramChatId()))
+            .build()));
   }
 
-  public Optional<UserPageData> getUserPage(String chatLink, Long userId) {
+  public Optional<UserPageDataDto> getUserPage(String chatLink, Long userId) {
     return getChatPage(chatLink)
       .flatMap(chatPage -> participantStatsRepository.findByTelegramChatIdAndTelegramUserId(
           chatPage.getChatStats().getTelegramChatId(), userId)
-        .map(userStats -> new UserPageData(
-          chatPage,
-          userStats,
-          hourlyMessagePointRepository.findHourlyForWeek(chatPage.getChatStats().getTelegramChatId(), userId)
-        )));
+        .map(userStats -> UserPageDataDto.builder()
+            .chatPage(chatPage)
+            .userStats(userStats)
+            .hourlyPoints( hourlyMessagePointRepository.findHourlyForWeek(chatPage.getChatStats().getTelegramChatId(), userId))
+            .build()));
   }
 }

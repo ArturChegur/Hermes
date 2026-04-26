@@ -1,6 +1,6 @@
 package chegur.hermes.frontend.repository;
 
-import chegur.hermes.frontend.dto.UserHourlyMessagePoint;
+import chegur.hermes.frontend.model.entity.UserHourlyMessagePointEntity;
 
 import java.util.List;
 import java.time.LocalDateTime;
@@ -9,7 +9,7 @@ import org.springframework.data.jdbc.repository.query.Query;
 import org.springframework.data.repository.Repository;
 import org.springframework.data.repository.query.Param;
 
-public interface UserHourlyMessagePointRepository extends Repository<UserHourlyMessagePoint, LocalDateTime> {
+public interface UserHourlyMessagePointRepository extends Repository<UserHourlyMessagePointEntity, LocalDateTime> {
 
   @Query("""
     with series as (
@@ -32,7 +32,7 @@ public interface UserHourlyMessagePointRepository extends Repository<UserHourlyM
              left join chat_hourly on chat_hourly.hour_start = series.hour_start
     order by series.hour_start
     """)
-  List<UserHourlyMessagePoint> findChatHourlyForWeek(@Param("telegramChatId") Long telegramChatId);
+  List<UserHourlyMessagePointEntity> findChatHourlyForWeek(@Param("telegramChatId") Long telegramChatId);
 
   @Query("""
     with series as (
@@ -51,6 +51,6 @@ public interface UserHourlyMessagePointRepository extends Repository<UserHourlyM
                          and src.hour_start = series.hour_start
     order by series.hour_start
     """)
-  List<UserHourlyMessagePoint> findHourlyForWeek(@Param("telegramChatId") Long telegramChatId,
-                                                 @Param("telegramUserId") Long telegramUserId);
+  List<UserHourlyMessagePointEntity> findHourlyForWeek(@Param("telegramChatId") Long telegramChatId,
+                                                       @Param("telegramUserId") Long telegramUserId);
 }

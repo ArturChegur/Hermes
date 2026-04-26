@@ -7,12 +7,12 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
-import chegur.hermes.frontend.dto.ChatLinkDetails;
-import chegur.hermes.frontend.dto.ChatPageData;
-import chegur.hermes.frontend.dto.ChatParticipantStatsView;
-import chegur.hermes.frontend.dto.ChatStatsView;
-import chegur.hermes.frontend.dto.UserHourlyMessagePoint;
-import chegur.hermes.frontend.dto.UserPageData;
+import chegur.hermes.frontend.model.entity.ChatLinkDetailsEntity;
+import chegur.hermes.frontend.dto.ChatPageDataDto;
+import chegur.hermes.frontend.model.view.ChatParticipantStatsView;
+import chegur.hermes.frontend.model.view.ChatStatsView;
+import chegur.hermes.frontend.model.entity.UserHourlyMessagePointEntity;
+import chegur.hermes.frontend.dto.UserPageDataDto;
 import chegur.hermes.frontend.repository.ChatParticipantStatsRepository;
 import chegur.hermes.frontend.repository.ChatStatsViewRepository;
 import chegur.hermes.frontend.repository.TelegramChatLinkStatsRepository;
@@ -52,7 +52,7 @@ class ChatStatisticsServiceTest {
   void getChatPageShouldReturnEmptyWhenLinkIsMissing() {
     when(chatLinkRepository.findActiveByCode(CHAT_LINK_CODE)).thenReturn(Optional.empty());
 
-    Optional<ChatPageData> result = service.getChatPage(CHAT_LINK_CODE);
+    Optional<ChatPageDataDto> result = service.getChatPage(CHAT_LINK_CODE);
 
     assertThat(result).isEmpty();
     verify(chatLinkRepository).findActiveByCode(CHAT_LINK_CODE);
@@ -61,11 +61,11 @@ class ChatStatisticsServiceTest {
 
   @Test
   void getChatPageShouldReturnEmptyWhenStatsViewIsMissing() {
-    ChatLinkDetails link = chatLink();
+    ChatLinkDetailsEntity link = chatLink();
     when(chatLinkRepository.findActiveByCode(CHAT_LINK_CODE)).thenReturn(Optional.of(link));
     when(chatStatsRepository.findByTelegramChatId(TELEGRAM_CHAT_ID)).thenReturn(Optional.empty());
 
-    Optional<ChatPageData> result = service.getChatPage(CHAT_LINK_CODE);
+    Optional<ChatPageDataDto> result = service.getChatPage(CHAT_LINK_CODE);
 
     assertThat(result).isEmpty();
     verify(chatLinkRepository).findActiveByCode(CHAT_LINK_CODE);
@@ -75,20 +75,20 @@ class ChatStatisticsServiceTest {
 
   @Test
   void getChatPageShouldReturnPageDataWhenLinkAndStatsExist() {
-    ChatLinkDetails link = chatLink();
+    ChatLinkDetailsEntity link = chatLink();
     ChatStatsView chatStats = chatStats();
     List<ChatParticipantStatsView> participants = List.of(participant(TELEGRAM_USER_ID, "Alice"));
-    List<UserHourlyMessagePoint> chatHourly = List.of(hourlyPoint(5));
+    List<UserHourlyMessagePointEntity> chatHourly = List.of(hourlyPoint(5));
 
     when(chatLinkRepository.findActiveByCode(CHAT_LINK_CODE)).thenReturn(Optional.of(link));
     when(chatStatsRepository.findByTelegramChatId(TELEGRAM_CHAT_ID)).thenReturn(Optional.of(chatStats));
     when(participantStatsRepository.findByTelegramChatId(TELEGRAM_CHAT_ID)).thenReturn(participants);
     when(hourlyMessagePointRepository.findChatHourlyForWeek(TELEGRAM_CHAT_ID)).thenReturn(chatHourly);
 
-    Optional<ChatPageData> result = service.getChatPage(CHAT_LINK_CODE);
+    Optional<ChatPageDataDto> result = service.getChatPage(CHAT_LINK_CODE);
 
     assertThat(result).isPresent();
-    ChatPageData pageData = result.orElseThrow();
+    ChatPageDataDto pageData = result.orElseThrow();
     assertThat(pageData.getLink()).isSameAs(link);
     assertThat(pageData.getChatStats()).isSameAs(chatStats);
     assertThat(pageData.getParticipants()).containsExactlyElementsOf(participants);
@@ -102,7 +102,7 @@ class ChatStatisticsServiceTest {
   void getUserPageShouldReturnEmptyWhenChatPageIsMissing() {
     when(chatLinkRepository.findActiveByCode(CHAT_LINK_CODE)).thenReturn(Optional.empty());
 
-    Optional<UserPageData> result = service.getUserPage(CHAT_LINK_CODE, TELEGRAM_USER_ID);
+    Optional<UserPageDataDto> result = service.getUserPage(CHAT_LINK_CODE, TELEGRAM_USER_ID);
 
     assertThat(result).isEmpty();
     verify(participantStatsRepository, never()).findByTelegramChatIdAndTelegramUserId(anyLong(), anyLong());
@@ -111,7 +111,7 @@ class ChatStatisticsServiceTest {
 
   @Test
   void getUserPageShouldReturnEmptyWhenUserStatsAreMissing() {
-    ChatLinkDetails link = chatLink();
+    ChatLinkDetailsEntity link = chatLink();
     ChatStatsView chatStats = chatStats();
 
     when(chatLinkRepository.findActiveByCode(CHAT_LINK_CODE)).thenReturn(Optional.of(link));
@@ -121,7 +121,7 @@ class ChatStatisticsServiceTest {
     when(participantStatsRepository.findByTelegramChatIdAndTelegramUserId(TELEGRAM_CHAT_ID, TELEGRAM_USER_ID))
       .thenReturn(Optional.empty());
 
-    Optional<UserPageData> result = service.getUserPage(CHAT_LINK_CODE, TELEGRAM_USER_ID);
+    Optional<UserPageDataDto> result = service.getUserPage(CHAT_LINK_CODE, TELEGRAM_USER_ID);
 
     assertThat(result).isEmpty();
     verify(participantStatsRepository).findByTelegramChatIdAndTelegramUserId(TELEGRAM_CHAT_ID, TELEGRAM_USER_ID);
@@ -130,13 +130,13 @@ class ChatStatisticsServiceTest {
 
   @Test
   void getUserPageShouldReturnUserDataWhenUserStatsExist() {
-    ChatLinkDetails link = chatLink();
+    ChatLinkDetailsEntity link = chatLink();
     ChatStatsView chatStats = chatStats();
     ChatParticipantStatsView userStats = participant(TELEGRAM_USER_ID, "Alice");
 
     List<ChatParticipantStatsView> participants = List.of(userStats);
-    List<UserHourlyMessagePoint> chatHourly = List.of(hourlyPoint(9));
-    List<UserHourlyMessagePoint> userHourly = List.of(hourlyPoint(3));
+    List<UserHourlyMessagePointEntity> chatHourly = List.of(hourlyPoint(9));
+    List<UserHourlyMessagePointEntity> userHourly = List.of(hourlyPoint(3));
 
     when(chatLinkRepository.findActiveByCode(CHAT_LINK_CODE)).thenReturn(Optional.of(link));
     when(chatStatsRepository.findByTelegramChatId(TELEGRAM_CHAT_ID)).thenReturn(Optional.of(chatStats));
@@ -146,23 +146,23 @@ class ChatStatisticsServiceTest {
       .thenReturn(Optional.of(userStats));
     when(hourlyMessagePointRepository.findHourlyForWeek(TELEGRAM_CHAT_ID, TELEGRAM_USER_ID)).thenReturn(userHourly);
 
-    Optional<UserPageData> result = service.getUserPage(CHAT_LINK_CODE, TELEGRAM_USER_ID);
+    Optional<UserPageDataDto> result = service.getUserPage(CHAT_LINK_CODE, TELEGRAM_USER_ID);
 
     assertThat(result).isPresent();
-    UserPageData userPageData = result.orElseThrow();
-    assertThat(userPageData.getChatPage()).isNotNull();
-    assertThat(userPageData.getChatPage().getLink()).isSameAs(link);
-    assertThat(userPageData.getChatPage().getChatStats()).isSameAs(chatStats);
-    assertThat(userPageData.getChatPage().getParticipants()).containsExactlyElementsOf(participants);
-    assertThat(userPageData.getChatPage().getHourlyPoints()).containsExactlyElementsOf(chatHourly);
-    assertThat(userPageData.getUserStats()).isSameAs(userStats);
-    assertThat(userPageData.getHourlyPoints()).containsExactlyElementsOf(userHourly);
+    UserPageDataDto userPageDataDto = result.orElseThrow();
+    assertThat(userPageDataDto.getChatPage()).isNotNull();
+    assertThat(userPageDataDto.getChatPage().getLink()).isSameAs(link);
+    assertThat(userPageDataDto.getChatPage().getChatStats()).isSameAs(chatStats);
+    assertThat(userPageDataDto.getChatPage().getParticipants()).containsExactlyElementsOf(participants);
+    assertThat(userPageDataDto.getChatPage().getHourlyPoints()).containsExactlyElementsOf(chatHourly);
+    assertThat(userPageDataDto.getUserStats()).isSameAs(userStats);
+    assertThat(userPageDataDto.getHourlyPoints()).containsExactlyElementsOf(userHourly);
 
     verify(hourlyMessagePointRepository).findHourlyForWeek(TELEGRAM_CHAT_ID, TELEGRAM_USER_ID);
   }
 
-  private ChatLinkDetails chatLink() {
-    return ChatLinkDetails.builder()
+  private ChatLinkDetailsEntity chatLink() {
+    return ChatLinkDetailsEntity.builder()
       .code(CHAT_LINK_CODE)
       .telegramChatId(TELEGRAM_CHAT_ID)
       .createdAt(LocalDateTime.now().minusDays(1))
@@ -197,7 +197,7 @@ class ChatStatisticsServiceTest {
     );
   }
 
-  private UserHourlyMessagePoint hourlyPoint(long messagesCount) {
-    return new UserHourlyMessagePoint(LocalDateTime.now().withMinute(0).withSecond(0).withNano(0), messagesCount);
+  private UserHourlyMessagePointEntity hourlyPoint(long messagesCount) {
+    return new UserHourlyMessagePointEntity(LocalDateTime.now().withMinute(0).withSecond(0).withNano(0), messagesCount);
   }
 }

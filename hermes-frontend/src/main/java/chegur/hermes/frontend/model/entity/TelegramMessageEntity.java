@@ -1,4 +1,4 @@
-package chegur.hermes.frontend.model;
+package chegur.hermes.frontend.model.entity;
 
 import java.time.Instant;
 

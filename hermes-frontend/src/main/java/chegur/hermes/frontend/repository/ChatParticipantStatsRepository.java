@@ -1,6 +1,6 @@
 package chegur.hermes.frontend.repository;
 
-import chegur.hermes.frontend.dto.ChatParticipantStatsView;
+import chegur.hermes.frontend.model.view.ChatParticipantStatsView;
 
 import java.util.List;
 import java.util.Optional;

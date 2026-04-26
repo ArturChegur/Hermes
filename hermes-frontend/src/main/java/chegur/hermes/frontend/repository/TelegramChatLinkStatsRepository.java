@@ -1,6 +1,6 @@
 package chegur.hermes.frontend.repository;
 
-import chegur.hermes.frontend.dto.ChatLinkDetails;
+import chegur.hermes.frontend.model.entity.ChatLinkDetailsEntity;
 
 import java.util.Optional;
 
@@ -8,7 +8,7 @@ import org.springframework.data.jdbc.repository.query.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 
-public interface TelegramChatLinkStatsRepository extends CrudRepository<ChatLinkDetails, String> {
+public interface TelegramChatLinkStatsRepository extends CrudRepository<ChatLinkDetailsEntity, String> {
 
   @Query("""
     select l.code,
@@ -22,5 +22,5 @@ public interface TelegramChatLinkStatsRepository extends CrudRepository<ChatLink
     order by l.expires_at desc
     limit 1
     """)
-  Optional<ChatLinkDetails> findActiveByCode(@Param("code") String code);
+  Optional<ChatLinkDetailsEntity> findActiveByCode(@Param("code") String code);
 }
