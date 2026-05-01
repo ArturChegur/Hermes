@@ -21,6 +21,22 @@ public class TelegramMessageService {
       .text(message)
       .build();
 
+    executeSendMessage(chatId, sendMessage);
+  }
+
+  public void sendMessage(Long chatId, String message, Integer replyToMessageId) {
+    SendMessage sendMessage = SendMessage.builder()
+      .chatId(chatId.toString())
+      .text(message)
+      .replyToMessageId(replyToMessageId)
+      .allowSendingWithoutReply(true)
+      .build();
+
+    executeSendMessage(chatId, sendMessage);
+  }
+
+  private void executeSendMessage(Long chatId, SendMessage sendMessage) {
+
     try {
       telegramClient.execute(sendMessage);
     } catch (TelegramApiException e) {

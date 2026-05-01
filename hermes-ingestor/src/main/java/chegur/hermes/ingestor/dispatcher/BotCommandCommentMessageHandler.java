@@ -27,20 +27,23 @@ public class BotCommandCommentMessageHandler implements BotCommandHandler {
   public void handle(Update update) {
     Message commandMessage = update.getMessage();
     Long chatId = commandMessage.getChatId();
+    Message repliedMessage = commandMessage.getReplyToMessage();
 
-    String messageToComment = extractMessageToComment(commandMessage);
+    String messageToComment = extractMessageToComment(repliedMessage);
 
     if (!StringUtils.hasText(messageToComment)) {
       telegramMessageService.sendMessage(chatId, REPLY_REQUIRED_TEXT);
       return;
     }
 
+    Integer repliedMessageId = repliedMessage.getMessageId();
+
     try {
       String llmComment = ollamaMessageCommentService.generateComment(messageToComment);
-      telegramMessageService.sendMessage(chatId, llmComment);
+      telegramMessageService.sendMessage(chatId, llmComment, repliedMessageId);
     } catch (IllegalStateException ex) {
       log.warn("Failed to generate llm comment for chatId = {}", chatId, ex);
-      telegramMessageService.sendMessage(chatId, COMMENT_ERROR_TEXT);
+      telegramMessageService.sendMessage(chatId, COMMENT_ERROR_TEXT, repliedMessageId);
     }
   }
 
@@ -49,8 +52,7 @@ public class BotCommandCommentMessageHandler implements BotCommandHandler {
     return BotCommands.COMMENT;
   }
 
-  private String extractMessageToComment(Message commandMessage) {
-    Message repliedMessage = commandMessage.getReplyToMessage();
+  private String extractMessageToComment(Message repliedMessage) {
     if (repliedMessage == null) {
       return null;
     }
