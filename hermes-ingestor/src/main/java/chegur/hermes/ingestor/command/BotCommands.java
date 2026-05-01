@@ -13,7 +13,8 @@ import lombok.experimental.FieldDefaults;
 @RequiredArgsConstructor
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 public enum BotCommands {
-  GET_LINK("getlink", "Сгенерировать ссылку на статистику чата");
+  GET_LINK("getlink", "Сгенерировать ссылку на статистику чата"),
+  COMMENT("reply", "Получить анализ сообщения");
 
   String value;
 

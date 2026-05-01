@@ -28,3 +28,7 @@ hermes:
         link-ttl-minutes: ${LINK_TTL_MINUTES}
     kafka:
         updates-topic: ${UPDATES_KAFKA_TOPIC}
+
+ollama:
+    base-url: ${OLLAMA_BASE_URL:http://localhost:11434}
+    model: ${OLLAMA_MODEL:qwen-rus-roast}

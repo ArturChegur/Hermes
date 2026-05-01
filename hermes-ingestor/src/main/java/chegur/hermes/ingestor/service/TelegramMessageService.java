@@ -4,13 +4,14 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.methods.updatingmessages.DeleteMessage;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class TelegramMessageSender {
+public class TelegramMessageService {
 
   private final TelegramClient telegramClient;
 
@@ -23,8 +24,22 @@ public class TelegramMessageSender {
     try {
       telegramClient.execute(sendMessage);
     } catch (TelegramApiException e) {
-      log.error("Failed to send telegram link message. chatId = {}", chatId, e);
+      log.error("Failed to send telegram link message, chatId = {}", chatId, e);
       throw new IllegalStateException("Failed to send telegram message", e);
+    }
+  }
+
+  public void deleteMessage(Long chatId, Integer messageId) {
+    DeleteMessage deleteMessage = DeleteMessage.builder()
+      .chatId(chatId)
+      .messageId(messageId)
+      .build();
+
+    try {
+      telegramClient.execute(deleteMessage);
+    } catch (TelegramApiException e) {
+      log.error("Failed to delete telegram message, chatId = {}", chatId, e);
+      throw new IllegalStateException("Failed to delete telegram message", e);
     }
   }
 }
